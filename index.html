@@ -186,18 +186,29 @@
         .toggle-btn {
             background: transparent;
             border: 1px solid #3a3530;
-            color: #7a756f;
+            color: #5a5550;
             font-family: 'Crimson Pro', Georgia, serif;
             font-size: 0.8rem;
             padding: 0.4rem 0.8rem;
             cursor: pointer;
             transition: all 0.3s ease;
             letter-spacing: 0.05em;
+            margin-left: 0.5rem;
+        }
+
+        .toggle-btn:first-child {
+            margin-left: 0;
         }
 
         .toggle-btn:hover {
             border-color: #5a5550;
             color: #a8a4a0;
+        }
+
+        .toggle-btn.active {
+            border-color: #7a756f;
+            color: #c8c4be;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         /* Reference links */
@@ -326,7 +337,8 @@
     <!-- Verse Screen -->
     <div id="verse-screen" class="screen">
         <div class="toggle-container">
-            <button class="toggle-btn" onclick="toggleTranslation()">literal</button>
+            <button class="toggle-btn" id="toggle-literal" onclick="toggleLiteral()">literal</button>
+            <button class="toggle-btn active" id="toggle-english" onclick="toggleEnglish()">english</button>
         </div>
 
         <div class="verse-content">
@@ -597,7 +609,8 @@
 
         // State
         let currentVerse = 0;
-        let translationMode = 'both'; // 'literal', 'english', 'both'
+        let showLiteral = false;
+        let showEnglish = true;
 
         // DOM elements
         const titleScreen = document.getElementById('title-screen');
@@ -609,7 +622,8 @@
         const verseIndicator = document.getElementById('verse-indicator');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
-        const toggleBtn = document.querySelector('.toggle-btn');
+        const toggleLiteralBtn = document.getElementById('toggle-literal');
+        const toggleEnglishBtn = document.getElementById('toggle-english');
         const touchHint = document.getElementById('touch-hint');
 
         // Show screen
@@ -645,13 +659,13 @@
 
             // Build translation content
             let translationHTML = '';
-            if (translationMode === 'literal' || translationMode === 'both') {
+            if (showLiteral) {
                 translationHTML += `<p class="literal">${verse.literal}</p>`;
             }
-            if (translationMode === 'both') {
+            if (showLiteral && showEnglish) {
                 translationHTML += '<div class="translation-divider"></div>';
             }
-            if (translationMode === 'english' || translationMode === 'both') {
+            if (showEnglish) {
                 translationHTML += `<p class="english">${verse.english}</p>`;
             }
             // Add reference link if present
@@ -684,16 +698,16 @@
             }
         }
 
-        // Toggle translation mode
-        function toggleTranslation() {
-            if (translationMode === 'both') {
-                translationMode = 'literal';
-            } else if (translationMode === 'literal') {
-                translationMode = 'english';
-            } else {
-                translationMode = 'both';
-            }
-            toggleBtn.textContent = translationMode;
+        // Toggle translation modes
+        function toggleLiteral() {
+            showLiteral = !showLiteral;
+            toggleLiteralBtn.classList.toggle('active', showLiteral);
+            renderVerse();
+        }
+
+        function toggleEnglish() {
+            showEnglish = !showEnglish;
+            toggleEnglishBtn.classList.toggle('active', showEnglish);
             renderVerse();
         }
 
@@ -710,8 +724,10 @@
                 nextVerse();
             } else if (e.key === 'ArrowLeft') {
                 prevVerse();
-            } else if (e.key === 't' || e.key === 'T') {
-                toggleTranslation();
+            } else if (e.key === 'l' || e.key === 'L') {
+                toggleLiteral();
+            } else if (e.key === 'e' || e.key === 'E') {
+                toggleEnglish();
             } else if (e.key === 'Escape') {
                 goHome();
             }
