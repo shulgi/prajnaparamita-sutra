@@ -67,7 +67,57 @@
             font-size: clamp(1rem, 2.5vw, 1.4rem);
             font-style: italic;
             color: #9a9590;
-            margin-bottom: 4rem;
+            margin-bottom: 2.5rem;
+        }
+
+        /* Version selector */
+        .version-selector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .version-label {
+            font-size: 0.85rem;
+            color: #6a6560;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        .version-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .version-btn {
+            background: transparent;
+            border: 1px solid #3a3530;
+            color: #6a6560;
+            font-family: 'Crimson Pro', Georgia, serif;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.03em;
+        }
+
+        .version-btn:hover {
+            border-color: #5a5550;
+            color: #9a9590;
+        }
+
+        .version-btn.active {
+            border-color: #7a756f;
+            color: #c8c4be;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .version-sanskrit {
+            font-size: 0.75rem;
+            color: #5a5550;
+            display: block;
+            margin-top: 0.25rem;
         }
 
         .begin-btn, .nav-btn, .end-btn {
@@ -331,6 +381,21 @@
     <div id="title-screen" class="screen active">
         <h1 class="main-title">prajñāpāramitā hṛdaya sūtra</h1>
         <p class="subtitle">the heart of the perfection of wisdom</p>
+
+        <div class="version-selector">
+            <span class="version-label">select version</span>
+            <div class="version-buttons">
+                <button class="version-btn active" id="version-short" onclick="selectVersion('short')">
+                    short
+                    <span class="version-sanskrit">saṃkṣiptamātṛkā</span>
+                </button>
+                <button class="version-btn" id="version-long" onclick="selectVersion('long')">
+                    long
+                    <span class="version-sanskrit">vistaramātṛkā</span>
+                </button>
+            </div>
+        </div>
+
         <button class="begin-btn" onclick="startReading()">begin</button>
     </div>
 
@@ -607,11 +672,312 @@
             }
         ];
 
+        // Long version verses (vistaramātṛkā)
+        const versesLong = [
+            {
+                transliteration: "namaḥ sarvajñāya",
+                sanskrit: "नमः सर्वज्ञाय",
+                literal: "homage to-the-omniscient-one",
+                english: "homage to the omniscient one."
+            },
+            {
+                transliteration: "oṃ namo bhagavatyai ārya-prajñāpāramitāyai",
+                sanskrit: "ॐ नमो भगवत्यै आर्य-प्रज्ञापारमितायै",
+                literal: "oṃ homage to-the-blessed-one noble-perfection-of-wisdom",
+                english: "oṃ! homage to the noble blessed perfection of wisdom."
+            },
+            {
+                transliteration: "evaṃ mayā śrutam",
+                sanskrit: "एवं मया श्रुतम्",
+                literal: "thus by-me heard",
+                english: "thus have i heard."
+            },
+            {
+                transliteration: "ekasmin samaye bhagavān rājagṛhe viharati sma",
+                sanskrit: "एकस्मिन् समये भगवान् राजगृहे विहरति स्म",
+                literal: "at-one time blessed-one at-rājagṛha was-dwelling",
+                english: "at one time the blessed one was dwelling at rājagṛha,"
+            },
+            {
+                transliteration: "gṛdhrakūṭe parvate",
+                sanskrit: "गृध्रकूटे पर्वते",
+                literal: "vulture-peak on-mountain",
+                english: "on vulture peak mountain,"
+            },
+            {
+                transliteration: "mahatā bhikṣusaṃghena sārdhaṃ mahatā ca bodhisattvasaṃghena",
+                sanskrit: "महता भिक्षुसंघेन सार्धं महता च बोधिसत्त्वसंघेन",
+                literal: "with-great assembly-of-monks together with-great and assembly-of-bodhisattvas",
+                english: "together with a great assembly of monks and a great assembly of bodhisattvas."
+            },
+            {
+                transliteration: "tena khalu samayena bhagavān gambhīrāvasaṃbodhaṃ nāma samādhiṃ samāpannaḥ",
+                sanskrit: "तेन खलु समयेन भगवान् गम्भीरावसंबोधं नाम समाधिं समापन्नः",
+                literal: "at-that indeed time blessed-one profound-illumination named samādhi entered",
+                english: "at that time, the blessed one had entered the samādhi called profound illumination."
+            },
+            {
+                transliteration: "tena ca samayena āryāvalokiteśvaro bodhisattvo mahāsattvo",
+                sanskrit: "तेन च समयेन आर्यावलोकितेश्वरो बोधिसत्त्वो महासत्त्वो",
+                literal: "at-that and time noble-avalokiteśvara bodhisattva great-being",
+                english: "and at that time, the noble avalokiteśvara, the bodhisattva, the great being,"
+            },
+            {
+                transliteration: "gambhīrāyāṃ prajñāpāramitāyāṃ caryāṃ caramāṇa evaṃ vyalokayati sma",
+                sanskrit: "गम्भीरायां प्रज्ञापारमितायां चर्यां चरमाण एवं व्यलोकयति स्म",
+                literal: "in-deep in-perfection-of-wisdom practice practicing thus perceived",
+                english: "while practicing the deep practice of the perfection of wisdom, perceived thus:"
+            },
+            {
+                transliteration: "pañca skandhās tāṃś ca svabhāvaśūnyān vyavalokayati",
+                sanskrit: "पञ्च स्कन्धास् तांश् च स्वभावशून्यान् व्यवलोकयति",
+                literal: "five aggregates them and self-nature-empty beheld",
+                english: "the five aggregates—and he beheld them empty of self-nature."
+            },
+            {
+                transliteration: "athāyuṣmān śāriputro buddhānubhāvenāryāvalokiteśvaraṃ bodhisattvam etad avocat",
+                sanskrit: "अथायुष्मान् शारिपुत्रो बुद्धानुभावेनार्यावलोकितेश्वरं बोधिसत्त्वम् एतद् अवोचत्",
+                literal: "then-venerable śāriputra by-buddha's-power to-noble-avalokiteśvara bodhisattva this said",
+                english: "then the venerable śāriputra, through the power of the buddha, said this to the noble avalokiteśvara, the bodhisattva:"
+            },
+            {
+                transliteration: "yaḥ kaścit kulaputro gambhīrāyāṃ prajñāpāramitāyāṃ caryāṃ cartukāmaḥ kathaṃ śikṣitavyaḥ",
+                sanskrit: "यः कश्चित् कुलपुत्रो गम्भीरायां प्रज्ञापारमितायां चर्यां चर्तुकामः कथं शिक्षितव्यः",
+                literal: "who any son-of-noble-family in-deep in-perfection-of-wisdom practice wishes-to-practice how should-train",
+                english: "\"how should any son of noble family who wishes to practice the deep practice of the perfection of wisdom train?\""
+            },
+            {
+                transliteration: "evam ukta āryāvalokiteśvaro bodhisattvo mahāsattva āyuṣmantaṃ śāriputram etad avocat",
+                sanskrit: "एवम् उक्त आर्यावलोकितेश्वरो बोधिसत्त्वो महासत्त्व आयुष्मन्तं शारिपुत्रम् एतद् अवोचत्",
+                literal: "thus addressed noble-avalokiteśvara bodhisattva great-being to-venerable śāriputra this said",
+                english: "thus addressed, the noble avalokiteśvara, the bodhisattva, the great being, said this to the venerable śāriputra:"
+            },
+            {
+                transliteration: "yaḥ kaścic chāriputra kulaputro vā kuladuhitā vā",
+                sanskrit: "यः कश्चिच् छारिपुत्र कुलपुत्रो वा कुलदुहिता वा",
+                literal: "who any śāriputra son-of-noble-family or daughter-of-noble-family or",
+                english: "\"śāriputra, any son of noble family or daughter of noble family"
+            },
+            {
+                transliteration: "gambhīrāyāṃ prajñāpāramitāyāṃ caryāṃ cartukāmas tenaivaṃ vyavalokayitavyam",
+                sanskrit: "गम्भीरायां प्रज्ञापारमितायां चर्यां चर्तुकामस् तेनैवं व्यवलोकयितव्यम्",
+                literal: "in-deep in-perfection-of-wisdom practice wishes-to-practice by-them-thus should-behold",
+                english: "who wishes to practice the deep practice of the perfection of wisdom should behold thus:"
+            },
+            {
+                transliteration: "pañca skandhās tāṃś ca svabhāvaśūnyān samanupasyati sma",
+                sanskrit: "पञ्च स्कन्धास् तांश् च स्वभावशून्यान् समनुपश्यति स्म",
+                literal: "five aggregates them and self-nature-empty correctly-observes",
+                english: "they correctly observe the five aggregates as empty of self-nature."
+            },
+            {
+                transliteration: "rūpaṃ śūnyatā śūnyataiva rūpam",
+                sanskrit: "रूपं शून्यता शून्यतैव रूपम्",
+                literal: "form emptiness emptiness-itself form",
+                english: "body is emptiness, emptiness itself is body."
+            },
+            {
+                transliteration: "rūpān na pṛthak śūnyatā śūnyatāyā na pṛthag rūpam",
+                sanskrit: "रूपान् न पृथक् शून्यता शून्यताया न पृथग् रूपम्",
+                literal: "from-form not separate emptiness from-emptiness not separate form",
+                english: "emptiness is not other than body, body is not other than emptiness."
+            },
+            {
+                transliteration: "yad rūpaṃ sā śūnyatā yā śūnyatā tad rūpam",
+                sanskrit: "यद् रूपं सा शून्यता या शून्यता तद् रूपम्",
+                literal: "which form that emptiness which emptiness that form",
+                english: "whatever is body, that is emptiness; whatever is emptiness, that is body."
+            },
+            {
+                transliteration: "evaṃ vedanā-saṃjñā-saṃskāra-vijñānāni ca śūnyatā",
+                sanskrit: "एवं वेदना-संज्ञा-संस्कार-विज्ञानानि च शून्यता",
+                literal: "thus feeling-perception-mental.formations-consciousness and emptiness",
+                english: "thus feeling, perception, mental formations, and consciousness are also emptiness."
+            },
+            {
+                transliteration: "evaṃ śāriputra sarvadharmā śūnyatālakṣaṇā",
+                sanskrit: "एवं शारिपुत्र सर्वधर्मा शून्यतालक्षणा",
+                literal: "thus śāriputra all-dharmas emptiness-marked",
+                english: "thus, śāriputra, all phenomena bear the mark of emptiness:"
+            },
+            {
+                transliteration: "anutpannā aniruddhā amalā vimalā anūnā asaṃpūrṇāḥ",
+                sanskrit: "अनुत्पन्ना अनिरुद्धा अमला विमला अनूना असंपूर्णाः",
+                literal: "not-arisen not-ceased not-impure not-pure not-deficient not-complete",
+                english: "no arising, no ceasing; no impurity, no purity; no lack, no completeness."
+            },
+            {
+                transliteration: "tasmāt tarhi śāriputra śūnyatāyāṃ na rūpaṃ na vedanā na saṃjñā na saṃskārā na vijñānam",
+                sanskrit: "तस्मात् तर्हि शारिपुत्र शून्यतायां न रूपं न वेदना न संज्ञा न संस्कारा न विज्ञानम्",
+                literal: "therefore then śāriputra in-emptiness no form no feeling no perception no mental.formations no consciousness",
+                english: "therefore, śāriputra, in emptiness there is no body, no feeling, no perception, no mental formations, no consciousness."
+            },
+            {
+                transliteration: "na cakṣur na śrotraṃ na ghrāṇaṃ na jihvā na kāyo na manaḥ",
+                sanskrit: "न चक्षुर् न श्रोत्रं न घ्राणं न जिह्वा न कायो न मनः",
+                literal: "no eye no ear no nose no tongue no body no mind",
+                english: "no eye, no ear, no nose, no tongue, no body, no mind;"
+            },
+            {
+                transliteration: "na rūpaṃ na śabdo na gandho na raso na spraṣṭavyaṃ na dharmāḥ",
+                sanskrit: "न रूपं न शब्दो न गन्धो न रसो न स्प्रष्टव्यं न धर्माः",
+                literal: "no form no sound no smell no taste no touchable no mental.objects",
+                english: "no sight, no sound, no smell, no taste, no touch, no thought."
+            },
+            {
+                transliteration: "na cakṣur-dhātur yāvan na mano-dhātur na dharma-dhātur na manovijñāna-dhātuḥ",
+                sanskrit: "न चक्षुर्-धातुर् यावन् न मनो-धातुर् न धर्म-धातुर् न मनोविज्ञान-धातुः",
+                literal: "no eye-element up.to no mind-element no dharma-element no mind-consciousness-element",
+                english: "no eye-element up to no mind-element, no dharma-element, no mind-consciousness-element.",
+                link: { url: "https://encyclopediaofbuddhism.org/wiki/Eighteen_dhatus", text: "the eighteen dhātus" }
+            },
+            {
+                transliteration: "na vidyā nāvidyā na kṣayo yāvan na jarā-maraṇaṃ na jarā-maraṇa-kṣayaḥ",
+                sanskrit: "न विद्या नाविद्या न क्षयो यावन् न जरा-मरणं न जरा-मरण-क्षयः",
+                literal: "no knowledge no ignorance no extinction up.to no aging-death no aging-death-extinction",
+                english: "no knowledge, no ignorance, no extinction, up to no aging-and-death, no extinction of aging-and-death.",
+                link: { url: "https://www.rigpawiki.org/index.php?title=Twelve_links_of_dependent_origination", text: "the twelve nidānas" }
+            },
+            {
+                transliteration: "na duḥkha-samudaya-nirodha-mārgā",
+                sanskrit: "न दुःख-समुदय-निरोध-मार्गा",
+                literal: "no suffering-origin-cessation-path",
+                english: "no suffering, no origin, no cessation, no path."
+            },
+            {
+                transliteration: "na jñānaṃ na prāptir nāprāptiḥ",
+                sanskrit: "न ज्ञानं न प्राप्तिर् नाप्राप्तिः",
+                literal: "no knowledge no attainment no non-attainment",
+                english: "no wisdom, no attainment, no non-attainment."
+            },
+            {
+                transliteration: "tasmāc chāriputra aprāptitvena bodhisattvānāṃ prajñāpāramitām āśritya viharaty acittāvaraṇaḥ",
+                sanskrit: "तस्माच् छारिपुत्र अप्राप्तित्वेन बोधिसत्त्वानां प्रज्ञापारमिताम् आश्रित्य विहरत्य् अचित्तावरणः",
+                literal: "therefore śāriputra by-non-attainment of-bodhisattvas perfection-of-wisdom relying-on dwells without-mind-obstruction",
+                english: "therefore, śāriputra, because of non-attainment, the bodhisattva, relying on the perfection of wisdom, dwells with mind unobstructed."
+            },
+            {
+                transliteration: "cittāvaraṇa-nāstitvād atrasto viparyāsātikrānto niṣṭha-nirvāṇaḥ",
+                sanskrit: "चित्तावरण-नास्तित्वाद् अत्रस्तो विपर्यासातिक्रान्तो निष्ठ-निर्वाणः",
+                literal: "mind-obstruction-non-existence-because unafraid delusion-gone-beyond final-nirvāṇa",
+                english: "because there is no obstruction of mind, there is no fear. having gone beyond delusion, they are grounded in nirvāṇa."
+            },
+            {
+                transliteration: "tryadhva-vyavasthitā sarva-buddhāḥ prajñāpāramitām āśritya anuttarāṃ samyaksaṃbodhim abhisaṃbuddhāḥ",
+                sanskrit: "त्र्यध्व-व्यवस्थिता सर्व-बुद्धाः प्रज्ञापारमिताम् आश्रित्य अनुत्तरां सम्यक्संबोधिम् अभिसंबुद्धाः",
+                literal: "three-times-abiding all-buddhas perfection-of-wisdom relying-on unsurpassed complete-perfect-awakening fully-awakened",
+                english: "all buddhas of past, present, and future, relying on the perfection of wisdom, attain unsurpassed complete perfect awakening."
+            },
+            {
+                transliteration: "tasmāj jñātavyaṃ prajñāpāramitā mahā-mantro",
+                sanskrit: "तस्माज् ज्ञातव्यं प्रज्ञापारमिता महा-मन्त्रो",
+                literal: "therefore should-be-known perfection-of-wisdom great-mantra",
+                english: "therefore it should be known: the perfection of wisdom is the great mantra,"
+            },
+            {
+                transliteration: "mahā-vidyā-mantro 'nuttara-mantro 'samasama-mantraḥ",
+                sanskrit: "महा-विद्या-मन्त्रो अनुत्तर-मन्त्रो असमसम-मन्त्रः",
+                literal: "great-knowledge-mantra unsurpassed-mantra unequaled-mantra",
+                english: "the mantra of great insight, the unsurpassed mantra, the mantra without equal,"
+            },
+            {
+                transliteration: "sarva-duḥkha-praśamana-mantraḥ satyam amithyatvāt",
+                sanskrit: "सर्व-दुःख-प्रशमन-मन्त्रः सत्यम् अमिथ्यत्वात्",
+                literal: "all-suffering-remover-mantra truth because-of-non-falseness",
+                english: "the mantra that removes all suffering—truth, not falsehood."
+            },
+            {
+                transliteration: "prajñāpāramitāyām ukto mantraḥ tadyathā",
+                sanskrit: "प्रज्ञापारमितायाम् उक्तो मन्त्रः तद्यथा",
+                literal: "in-perfection-of-wisdom spoken mantra thus",
+                english: "the mantra spoken in the perfection of wisdom:"
+            },
+            {
+                transliteration: "tadyathā gate gate pāragate pārasaṃgate bodhi svāhā",
+                sanskrit: "तद्यथा गते गते पारगते पारसंगते बोधि स्वाहा",
+                literal: "thus gone gone to.other.shore.gone completely.to.other.shore.gone awakening hail",
+                english: "tadyathā gate gate pāragate pārasaṃgate bodhi svāhā"
+            },
+            {
+                transliteration: "gate gate pāragate pārasaṃgate bodhi svāhā",
+                sanskrit: "गते गते पारगते पारसंगते बोधि स्वाहा",
+                literal: "gone gone to.other.shore.gone completely.to.other.shore.gone awakening hail",
+                english: "gate gate pāragate pārasaṃgate bodhi svāhā"
+            },
+            {
+                transliteration: "gate gate pāragate pārasaṃgate bodhi svāhā",
+                sanskrit: "गते गते पारगते पारसंगते बोधि स्वाहा",
+                literal: "gone gone to.other.shore.gone completely.to.other.shore.gone awakening hail",
+                english: "gate gate pāragate pārasaṃgate bodhi svāhā"
+            },
+            {
+                transliteration: "evaṃ śāriputra gambhīrāyāṃ prajñāpāramitāyāṃ caryāyāṃ śikṣitavyaṃ bodhisattvena",
+                sanskrit: "एवं शारिपुत्र गम्भीरायां प्रज्ञापारमितायां चर्यायां शिक्षितव्यं बोधिसत्त्वेन",
+                literal: "thus śāriputra in-deep in-perfection-of-wisdom in-practice should-train by-bodhisattva",
+                english: "thus, śāriputra, should the bodhisattva train in the practice of the deep perfection of wisdom.\""
+            },
+            {
+                transliteration: "atha khalu bhagavān tasmāt samādher vyutthāya āryāvalokiteśvarasya bodhisattvasya sādhukāram adāt",
+                sanskrit: "अथ खलु भगवान् तस्मात् समाधेर् व्युत्थाय आर्यावलोकितेश्वरस्य बोधिसत्त्वस्य साधुकारम् अदात्",
+                literal: "then indeed blessed-one from-that samādhi arising to-noble-avalokiteśvara bodhisattva praise gave",
+                english: "then the blessed one arose from that samādhi and gave praise to the noble avalokiteśvara, the bodhisattva:"
+            },
+            {
+                transliteration: "sādhu sādhu kulaputra evam etat kulaputra",
+                sanskrit: "साधु साधु कुलपुत्र एवम् एतत् कुलपुत्र",
+                literal: "well-done well-done son-of-noble-family thus it-is son-of-noble-family",
+                english: "\"well done, well done, son of noble family! it is so, son of noble family."
+            },
+            {
+                transliteration: "evam etad gambhīrāyāṃ prajñāpāramitāyāṃ caryaṃ cartavyaṃ yathā tvayā nirdiṣṭam",
+                sanskrit: "एवम् एतद् गम्भीरायां प्रज्ञापारमितायां चर्यं चर्तव्यं यथा त्वया निर्दिष्टम्",
+                literal: "thus it-is in-deep in-perfection-of-wisdom practice should-be-practiced as by-you taught",
+                english: "it is so—the practice of the deep perfection of wisdom should be practiced just as you have taught."
+            },
+            {
+                transliteration: "anumodyate tathāgatair arhadbhiḥ",
+                sanskrit: "अनुमोद्यते तथागतैर् अर्हद्भिः",
+                literal: "there-is-rejoicing by-tathāgatas by-arhats",
+                english: "even the tathāgatas and arhats rejoice.\""
+            },
+            {
+                transliteration: "idam avocad bhagavān āttamanā",
+                sanskrit: "इदम् अवोचद् भगवान् आत्तमना",
+                literal: "this spoke blessed-one joyfully",
+                english: "the blessed one spoke this with joy."
+            },
+            {
+                transliteration: "āyuṣmān śāriputra āryāvalokiteśvaraś ca bodhisattvaḥ",
+                sanskrit: "आयुष्मान् शारिपुत्र आर्यावलोकितेश्वरश् च बोधिसत्त्वः",
+                literal: "venerable śāriputra noble-avalokiteśvara and bodhisattva",
+                english: "the venerable śāriputra and the noble avalokiteśvara, the bodhisattva,"
+            },
+            {
+                transliteration: "sā ca sarvāvatī parṣat sadevamānuṣāsuragandharvaś ca lokaḥ",
+                sanskrit: "सा च सर्वावती पर्षत् सदेवमानुषासुरगन्धर्वश् च लोकः",
+                literal: "that and entire assembly with-gods-humans-asuras-gandharvas and world",
+                english: "and the entire assembly, and the world with its gods, humans, asuras, and gandharvas,"
+            },
+            {
+                transliteration: "bhagavato bhāṣitam abhyanandan iti",
+                sanskrit: "भगवतो भाषितम् अभ्यनन्दन् इति",
+                literal: "of-blessed-one words rejoiced thus",
+                english: "rejoiced and praised the words of the blessed one."
+            },
+            {
+                transliteration: "prajñāpāramitā-hṛdaya-sūtraṃ samāptam",
+                sanskrit: "प्रज्ञापारमिता-हृदय-सूत्रं समाप्तम्",
+                literal: "perfection-of-wisdom-heart-sūtra complete",
+                english: "this completes the heart of the perfection of wisdom sūtra."
+            }
+        ];
+
         // State
         let currentVerse = 0;
         let showLiteral = false;
         let showEnglish = true;
         let wakeLock = null;
+        let selectedVersion = 'short'; // 'short' or 'long'
 
         // Wake Lock API - prevents screen from turning off during reading
         async function requestWakeLock() {
@@ -655,6 +1021,20 @@
         const toggleLiteralBtn = document.getElementById('toggle-literal');
         const toggleEnglishBtn = document.getElementById('toggle-english');
         const touchHint = document.getElementById('touch-hint');
+        const versionShortBtn = document.getElementById('version-short');
+        const versionLongBtn = document.getElementById('version-long');
+
+        // Get current verses array based on selected version
+        function getVerses() {
+            return selectedVersion === 'long' ? versesLong : verses;
+        }
+
+        // Version selection
+        function selectVersion(version) {
+            selectedVersion = version;
+            versionShortBtn.classList.toggle('active', version === 'short');
+            versionLongBtn.classList.toggle('active', version === 'long');
+        }
 
         // Show screen
         function showScreen(screen) {
@@ -684,7 +1064,8 @@
 
         // Render current verse
         function renderVerse() {
-            const verse = verses[currentVerse];
+            const currentVerses = getVerses();
+            const verse = currentVerses[currentVerse];
 
             transliterationEl.textContent = verse.transliteration;
             sanskritEl.textContent = verse.sanskrit;
@@ -707,7 +1088,7 @@
             translationContainer.innerHTML = translationHTML;
 
             // Update indicator
-            verseIndicator.textContent = `${currentVerse + 1} / ${verses.length}`;
+            verseIndicator.textContent = `${currentVerse + 1} / ${currentVerses.length}`;
 
             // Update buttons
             prevBtn.disabled = currentVerse === 0;
@@ -715,7 +1096,8 @@
 
         // Navigation
         async function nextVerse() {
-            if (currentVerse < verses.length - 1) {
+            const currentVerses = getVerses();
+            if (currentVerse < currentVerses.length - 1) {
                 currentVerse++;
                 renderVerse();
             } else {
