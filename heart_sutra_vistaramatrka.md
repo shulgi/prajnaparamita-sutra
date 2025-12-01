@@ -353,11 +353,11 @@ the mantra that removes all suffering—truth, not falsehood.
 
 ---
 
-**prajñāpāramitāyām ukto mantraḥ tadyathā**
+**prajñāpāramitāyām ukto mantraḥ**
 
-प्रज्ञापारमितायाम् उक्तो मन्त्रः तद्यथा
+प्रज्ञापारमितायाम् उक्तो मन्त्रः
 
-*in-perfection-of-wisdom spoken mantra thus*
+*in-perfection-of-wisdom spoken mantra*
 
 the mantra spoken in the perfection of wisdom:
 
@@ -373,7 +373,7 @@ tadyathā gate gate pāragate pārasaṃgate bodhi svāhā
 
 ---
 
-**gate gate pāragate pārasaṃgate bodhi svāhā**
+**gate gate pāragate pārasaṃgate bodhi svāhā (2)**
 
 गते गते पारगते पारसंगते बोधि स्वाहा
 
@@ -383,7 +383,7 @@ gate gate pāragate pārasaṃgate bodhi svāhā
 
 ---
 
-**gate gate pāragate pārasaṃgate bodhi svāhā**
+**gate gate pāragate pārasaṃgate bodhi svāhā (3)**
 
 गते गते पारगते पारसंगते बोधि स्वाहा
 
