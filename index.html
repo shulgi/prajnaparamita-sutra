@@ -611,6 +611,36 @@
         let currentVerse = 0;
         let showLiteral = false;
         let showEnglish = true;
+        let wakeLock = null;
+
+        // Wake Lock API - prevents screen from turning off during reading
+        async function requestWakeLock() {
+            if ('wakeLock' in navigator) {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    wakeLock.addEventListener('release', () => {
+                        console.log('Wake Lock released');
+                    });
+                    console.log('Wake Lock acquired');
+                } catch (err) {
+                    console.log('Wake Lock error:', err.message);
+                }
+            }
+        }
+
+        async function releaseWakeLock() {
+            if (wakeLock !== null) {
+                await wakeLock.release();
+                wakeLock = null;
+            }
+        }
+
+        // Re-acquire wake lock when page becomes visible again
+        document.addEventListener('visibilitychange', async () => {
+            if (document.visibilityState === 'visible' && verseScreen.classList.contains('active')) {
+                await requestWakeLock();
+            }
+        });
 
         // DOM elements
         const titleScreen = document.getElementById('title-screen');
@@ -633,10 +663,11 @@
         }
 
         // Start reading
-        function startReading() {
+        async function startReading() {
             currentVerse = 0;
             showScreen(verseScreen);
             renderVerse();
+            await requestWakeLock();
 
             // Show touch hint briefly
             setTimeout(() => {
@@ -646,8 +677,9 @@
         }
 
         // Go home
-        function goHome() {
+        async function goHome() {
             showScreen(titleScreen);
+            await releaseWakeLock();
         }
 
         // Render current verse
@@ -682,12 +714,13 @@
         }
 
         // Navigation
-        function nextVerse() {
+        async function nextVerse() {
             if (currentVerse < verses.length - 1) {
                 currentVerse++;
                 renderVerse();
             } else {
                 showScreen(endScreen);
+                await releaseWakeLock();
             }
         }
 
