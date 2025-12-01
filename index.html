@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Prajñāpāramitā Hṛdaya Sūtra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Crimson Pro', Georgia, serif;
+            background: #0a0a0b;
+            color: #e8e6e3;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Screen container */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        .screen.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Title Screen */
+        #title-screen {
+            text-align: center;
+        }
+
+        .main-title {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            color: #f5f3f0;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            font-style: italic;
+            color: #9a9590;
+            margin-bottom: 4rem;
+        }
+
+        .begin-btn, .nav-btn, .end-btn {
+            background: transparent;
+            border: 1px solid #4a4540;
+            color: #c8c4be;
+            font-family: 'Crimson Pro', Georgia, serif;
+            font-size: 1.1rem;
+            padding: 0.8rem 2.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.1em;
+        }
+
+        .begin-btn:hover, .nav-btn:hover, .end-btn:hover {
+            border-color: #8a8580;
+            color: #f5f3f0;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Verse Screen */
+        #verse-screen {
+            justify-content: space-between;
+            padding: 1.5rem;
+        }
+
+        .verse-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+            padding: 1rem;
+        }
+
+        .transliteration {
+            font-size: clamp(1.4rem, 4vw, 2.2rem);
+            font-weight: 600;
+            color: #f5f3f0;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .sanskrit {
+            font-size: clamp(1.1rem, 3vw, 1.6rem);
+            color: #7a756f;
+            margin-bottom: 2.5rem;
+            line-height: 1.5;
+        }
+
+        .translation-container {
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 1rem;
+        }
+
+        .literal {
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            font-style: italic;
+            color: #b8b4ae;
+            line-height: 1.6;
+        }
+
+        .english {
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            color: #d8d4ce;
+            line-height: 1.6;
+        }
+
+        .translation-divider {
+            width: 40px;
+            height: 1px;
+            background: #3a3530;
+            margin: 0.5rem auto;
+        }
+
+        /* Navigation */
+        .verse-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 400px;
+            padding: 1rem 0;
+        }
+
+        .nav-btn {
+            padding: 0.6rem 1.5rem;
+            font-size: 0.95rem;
+            min-width: 100px;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .verse-indicator {
+            font-size: 0.85rem;
+            color: #5a5550;
+            letter-spacing: 0.1em;
+        }
+
+        /* Translation Toggle */
+        .toggle-container {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+        }
+
+        .toggle-btn {
+            background: transparent;
+            border: 1px solid #3a3530;
+            color: #7a756f;
+            font-family: 'Crimson Pro', Georgia, serif;
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.05em;
+        }
+
+        .toggle-btn:hover {
+            border-color: #5a5550;
+            color: #a8a4a0;
+        }
+
+        /* Reference links */
+        .reference-link {
+            display: inline-block;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: #6a6560;
+            text-decoration: none;
+            border-bottom: 1px solid #3a3530;
+            padding-bottom: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .reference-link:hover {
+            color: #9a9590;
+            border-bottom-color: #5a5550;
+        }
+
+        /* End Screen */
+        #end-screen {
+            text-align: center;
+        }
+
+        .end-message {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-style: italic;
+            color: #9a9590;
+            margin-bottom: 1rem;
+        }
+
+        .end-sanskrit {
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            color: #6a6560;
+            margin-bottom: 3rem;
+        }
+
+        .end-buttons {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .end-btn {
+            padding: 0.7rem 2rem;
+        }
+
+        /* Touch hint */
+        .touch-hint {
+            position: absolute;
+            bottom: 6rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #4a4540;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .touch-hint.visible {
+            opacity: 1;
+        }
+
+        /* Swipe areas for mobile */
+        .swipe-area {
+            position: absolute;
+            top: 0;
+            bottom: 80px;
+            width: 50%;
+        }
+
+        .swipe-area.left {
+            left: 0;
+        }
+
+        .swipe-area.right {
+            right: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .screen {
+                padding: 1rem;
+            }
+
+            .verse-content {
+                padding: 0.5rem;
+            }
+
+            .translation-container {
+                min-height: 100px;
+            }
+
+            .toggle-container {
+                top: 1rem;
+                right: 1rem;
+            }
+
+            .verse-nav {
+                padding: 0.5rem 0;
+            }
+
+            .nav-btn {
+                padding: 0.5rem 1rem;
+                min-width: 80px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Prevent text selection on navigation */
+        .nav-btn, .begin-btn, .end-btn, .toggle-btn {
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <!-- Title Screen -->
+    <div id="title-screen" class="screen active">
+        <h1 class="main-title">prajñāpāramitā hṛdaya sūtra</h1>
+        <p class="subtitle">the heart of the perfection of wisdom</p>
+        <button class="begin-btn" onclick="startReading()">begin</button>
+    </div>
+
+    <!-- Verse Screen -->
+    <div id="verse-screen" class="screen">
+        <div class="toggle-container">
+            <button class="toggle-btn" onclick="toggleTranslation()">literal</button>
+        </div>
+
+        <div class="verse-content">
+            <p class="transliteration" id="transliteration"></p>
+            <p class="sanskrit" id="sanskrit"></p>
+            <div class="translation-container" id="translation-container"></div>
+        </div>
+
+        <div class="verse-nav">
+            <button class="nav-btn" id="prev-btn" onclick="prevVerse()">← prev</button>
+            <span class="verse-indicator" id="verse-indicator"></span>
+            <button class="nav-btn" id="next-btn" onclick="nextVerse()">next →</button>
+        </div>
+
+        <p class="touch-hint" id="touch-hint">swipe or use arrow keys to navigate</p>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="screen">
+        <p class="end-message">iti prajñāpāramitā-hṛdayaṃ samāptam</p>
+        <p class="end-sanskrit">thus the heart of the perfection of wisdom is complete</p>
+        <div class="end-buttons">
+            <button class="end-btn" onclick="goHome()">return</button>
+            <button class="end-btn" onclick="startReading()">begin again</button>
+        </div>
+    </div>
+
+    <script>
+        // Verse data parsed from the Heart Sutra
+        const verses = [
+            {
+                transliteration: "oṃ namo bhagavatyai ārya-prajñāpāramitāyai",
+                sanskrit: "ॐ नमो भगवत्यै आर्य-प्रज्ञापारमितायै",
+                literal: "oṃ homage to-the-blessed-one noble-perfection-of-wisdom",
+                english: "oṃ! homage to the noble blessed perfection of wisdom."
+            },
+            {
+                transliteration: "ārya-avalokiteśvaro bodhisattvo gambhīrāṃ prajñāpāramitā-caryāṃ caramāṇo",
+                sanskrit: "आर्य-अवलोकितेश्वरो बोधिसत्त्वो गम्भीरां प्रज्ञापारमिता-चर्यां चरमाणो",
+                literal: "noble-avalokiteśvara bodhisattva deep perfection-of-wisdom-practice practicing",
+                english: "the noble avalokiteśvara, the bodhisattva of compassion, while practicing the deep practice of the perfection of wisdom,"
+            },
+            {
+                transliteration: "vyavalokayati sma pañca-skandhāṃs tāṃś ca svabhāva-śūnyān paśyati sma",
+                sanskrit: "व्यवलोकयति स्म पञ्च-स्कन्धांस् तांश् च स्वभाव-शून्यान् पश्यति स्म",
+                literal: "was-looking-at five-aggregates them and self-nature-empty saw",
+                english: "perceived the five aggregates and saw them empty of self-nature."
+            },
+            {
+                transliteration: "iha śāriputra",
+                sanskrit: "इह शारिपुत्र",
+                literal: "here śāriputra",
+                english: "here, śāriputra,"
+            },
+            {
+                transliteration: "rūpaṃ śūnyatā śūnyataiva rūpam",
+                sanskrit: "रूपं शून्यता शून्यतैव रूपम्",
+                literal: "form emptiness emptiness-itself form",
+                english: "body is emptiness, emptiness itself is body."
+            },
+            {
+                transliteration: "rūpān na pṛthak śūnyatā",
+                sanskrit: "रूपान् न पृथक् शून्यता",
+                literal: "from-form not separate emptiness",
+                english: "emptiness is not other than body,"
+            },
+            {
+                transliteration: "śūnyatāyā na pṛthag rūpam",
+                sanskrit: "शून्यताया न पृथग् रूपम्",
+                literal: "from-emptiness not separate form",
+                english: "body is not other than emptiness."
+            },
+            {
+                transliteration: "yad rūpaṃ sā śūnyatā",
+                sanskrit: "यद् रूपं सा शून्यता",
+                literal: "which form that emptiness",
+                english: "whatever is body, that is emptiness;"
+            },
+            {
+                transliteration: "yā śūnyatā tad rūpam",
+                sanskrit: "या शून्यता तद् रूपम्",
+                literal: "which emptiness that form",
+                english: "whatever is emptiness, that is body."
+            },
+            {
+                transliteration: "evam eva vedanā-saṃjñā-saṃskāra-vijñānam",
+                sanskrit: "एवम् एव वेदना-संज्ञा-संस्कार-विज्ञानम्",
+                literal: "thus just feeling-perception-mental.formations-consciousness",
+                english: "the same is true of feeling, perception, mental formations, and consciousness."
+            },
+            {
+                transliteration: "iha śāriputra",
+                sanskrit: "इह शारिपुत्र",
+                literal: "here śāriputra",
+                english: "here, śāriputra,"
+            },
+            {
+                transliteration: "sarva-dharmāḥ śūnyatā-lakṣaṇā",
+                sanskrit: "सर्व-धर्माः शून्यता-लक्षणा",
+                literal: "all-dharmas emptiness-marked",
+                english: "all phenomena bear the mark of emptiness:"
+            },
+            {
+                transliteration: "anutpannā aniruddhā amalā avimalā anūnā aparipūrṇāḥ",
+                sanskrit: "अनुत्पन्ना अनिरुद्धा अमला अविमला अनूना अपरिपूर्णाः",
+                literal: "not-arisen not-ceased not-defiled not-pure not-deficient not-complete",
+                english: "no arising, no ceasing; no defilement, no purity; no lack, no completeness."
+            },
+            {
+                transliteration: "tasmāc śāriputra",
+                sanskrit: "तस्माच् शारिपुत्र",
+                literal: "therefore śāriputra",
+                english: "therefore, śāriputra,"
+            },
+            {
+                transliteration: "śūnyatāyāṃ na rūpaṃ na vedanā na saṃjñā na saṃskārāḥ na vijñānam",
+                sanskrit: "शून्यतायां न रूपं न वेदना न संज्ञा न संस्काराः न विज्ञानम्",
+                literal: "in-emptiness no form no feeling no perception no mental.formations no consciousness",
+                english: "in emptiness there is no body, no feeling, no perception, no mental formations, no consciousness."
+            },
+            {
+                transliteration: "na cakṣuḥ-śrotra-ghrāṇa-jihvā-kāya-manāṃsi",
+                sanskrit: "न चक्षुः-श्रोत्र-घ्राण-जिह्वा-काय-मनांसि",
+                literal: "no eye-ear-nose-tongue-body-minds",
+                english: "no eye, no ear, no nose, no tongue, no body, no mind;"
+            },
+            {
+                transliteration: "na rūpa-śabda-gandha-rasa-spraṣṭavya-dharmāḥ",
+                sanskrit: "न रूप-शब्द-गन्ध-रस-स्प्रष्टव्य-धर्माः",
+                literal: "no form-sound-smell-taste-touchable-mental.objects",
+                english: "no sight, no sound, no smell, no taste, no touch, no thought."
+            },
+            {
+                transliteration: "na cakṣur-dhātur yāvan na manovijñāna-dhātuḥ",
+                sanskrit: "न चक्षुर्-धातुर् यावन् न मनोविज्ञान-धातुः",
+                literal: "no eye-element up.to no mind-consciousness-element",
+                english: "no eye-element up to no mind-consciousness-element.",
+                link: { url: "https://encyclopediaofbuddhism.org/wiki/Eighteen_dhatus", text: "the eighteen dhātus" }
+            },
+            {
+                transliteration: "na avidyā na avidyā-kṣayo",
+                sanskrit: "न अविद्या न अविद्या-क्षयो",
+                literal: "no ignorance no ignorance-extinction",
+                english: "no ignorance, no extinction of ignorance,",
+                link: { url: "https://www.rigpawiki.org/index.php?title=Twelve_links_of_dependent_origination", text: "the twelve nidānas" }
+            },
+            {
+                transliteration: "yāvan na jarā-maraṇaṃ na jarā-maraṇa-kṣayo",
+                sanskrit: "यावन् न जरा-मरणं न जरा-मरण-क्षयो",
+                literal: "up.to no aging-death no aging-death-extinction",
+                english: "up to no aging-and-death, no extinction of aging-and-death."
+            },
+            {
+                transliteration: "na duḥkha-samudaya-nirodha-mārgā",
+                sanskrit: "न दुःख-समुदय-निरोध-मार्गा",
+                literal: "no suffering-origin-cessation-path",
+                english: "no suffering, no origin, no cessation, no path."
+            },
+            {
+                transliteration: "na jñānaṃ na prāptir",
+                sanskrit: "न ज्ञानं न प्राप्तिर्",
+                literal: "no knowledge no attainment",
+                english: "no wisdom, no attainment,"
+            },
+            {
+                transliteration: "na aprāptiḥ",
+                sanskrit: "न अप्राप्तिः",
+                literal: "no non-attainment",
+                english: "no non-attainment."
+            },
+            {
+                transliteration: "tasmāc śāriputra",
+                sanskrit: "तस्माच् शारिपुत्र",
+                literal: "therefore śāriputra",
+                english: "therefore, śāriputra,"
+            },
+            {
+                transliteration: "aprāptitvād bodhisattvasya prajñāpāramitām āśritya viharaty acittāvaraṇaḥ",
+                sanskrit: "अप्राप्तित्वाद् बोधिसत्त्वस्य प्रज्ञापारमिताम् आश्रित्य विहरत्य् अचित्तावरणः",
+                literal: "because.of.non-attainment of.bodhisattva perfection.of.wisdom relying.on dwells without-mind-obstruction",
+                english: "because of non-attainment, the bodhisattva, relying on the perfection of wisdom, dwells with mind unobstructed."
+            },
+            {
+                transliteration: "cittāvaraṇa-nāstitvād atrasto viparyāsa-atikrānto niṣṭhā-nirvāṇa-prāptaḥ",
+                sanskrit: "चित्तावरण-नास्तित्वाद् अत्रस्तो विपर्यास-अतिक्रान्तो निष्ठा-निर्वाण-प्राप्तः",
+                literal: "mind-obstruction-non-existence-because unafraid delusion-gone.beyond final-nirvāṇa-attained",
+                english: "because there is no obstruction of mind, there is no fear. having gone beyond delusion, they attain final nirvāṇa."
+            },
+            {
+                transliteration: "tryadhva-vyavasthitāḥ sarva-buddhāḥ prajñāpāramitām āśritya anuttarāṃ samyaksambodhim abhisambuddhāḥ",
+                sanskrit: "त्र्यध्व-व्यवस्थिताः सर्व-बुद्धाः प्रज्ञापारमिताम् आश्रित्य अनुत्तरां सम्यक्सम्बोधिम् अभिसम्बुद्धाः",
+                literal: "three-times-abiding all-buddhas perfection.of.wisdom relying.on unsurpassed complete.perfect.awakening fully.awakened",
+                english: "all buddhas of past, present, and future, relying on the perfection of wisdom, attain unsurpassed complete perfect awakening."
+            },
+            {
+                transliteration: "tasmāj jñātavyaṃ",
+                sanskrit: "तस्माज् ज्ञातव्यं",
+                literal: "therefore should.be.known",
+                english: "therefore it should be known:"
+            },
+            {
+                transliteration: "prajñāpāramitā mahā-mantro",
+                sanskrit: "प्रज्ञापारमिता महा-मन्त्रो",
+                literal: "perfection.of.wisdom great-mantra",
+                english: "the perfection of wisdom is the great mantra,"
+            },
+            {
+                transliteration: "mahā-vidyā-mantro",
+                sanskrit: "महा-विद्या-मन्त्रो",
+                literal: "great-knowledge-mantra",
+                english: "the mantra of great insight,"
+            },
+            {
+                transliteration: "'nuttara-mantro",
+                sanskrit: "अनुत्तर-मन्त्रो",
+                literal: "unsurpassed-mantra",
+                english: "the unsurpassed mantra,"
+            },
+            {
+                transliteration: "'samasama-mantraḥ",
+                sanskrit: "असमसम-मन्त्रः",
+                literal: "unequaled-mantra",
+                english: "the mantra without equal,"
+            },
+            {
+                transliteration: "sarva-duḥkha-praśamanaḥ",
+                sanskrit: "सर्व-दुःख-प्रशमनः",
+                literal: "all-suffering-remover",
+                english: "the remover of all suffering—"
+            },
+            {
+                transliteration: "satyam amithyatvāt",
+                sanskrit: "सत्यम् अमिथ्यत्वात्",
+                literal: "truth because.of.non-falseness",
+                english: "truth, not falsehood."
+            },
+            {
+                transliteration: "prajñāpāramitāyām ukto mantraḥ",
+                sanskrit: "प्रज्ञापारमितायाम् उक्तो मन्त्रः",
+                literal: "in.perfection.of.wisdom spoken mantra",
+                english: "the mantra spoken in the perfection of wisdom:"
+            },
+            {
+                transliteration: "tadyathā gate gate pāragate pārasaṃgate bodhi svāhā",
+                sanskrit: "तद्यथा गते गते पारगते पारसंगते बोधि स्वाहा",
+                literal: "thus gone gone to.other.shore.gone completely.to.other.shore.gone awakening hail",
+                english: "tadyathā gate gate pāragate pārasaṃgate bodhi svāhā"
+            },
+            {
+                transliteration: "gate gate pāragate pārasaṃgate bodhi svāhā",
+                sanskrit: "गते गते पारगते पारसंगते बोधि स्वाहा",
+                literal: "gone gone to.other.shore.gone completely.to.other.shore.gone awakening hail",
+                english: "gate gate pāragate pārasaṃgate bodhi svāhā"
+            },
+            {
+                transliteration: "gate gate pāragate pārasaṃgate bodhi svāhā",
+                sanskrit: "गते गते पारगते पारसंगते बोधि स्वाहा",
+                literal: "gone gone to.other.shore.gone completely.to.other.shore.gone awakening hail",
+                english: "gate gate pāragate pārasaṃgate bodhi svāhā"
+            },
+            {
+                transliteration: "iti prajñāpāramitā-hṛdayaṃ samāptam",
+                sanskrit: "इति प्रज्ञापारमिता-हृदयं समाप्तम्",
+                literal: "thus perfection.of.wisdom-heart complete",
+                english: "this completes the heart of the perfection of wisdom."
+            }
+        ];
+
+        // State
+        let currentVerse = 0;
+        let translationMode = 'both'; // 'literal', 'english', 'both'
+
+        // DOM elements
+        const titleScreen = document.getElementById('title-screen');
+        const verseScreen = document.getElementById('verse-screen');
+        const endScreen = document.getElementById('end-screen');
+        const transliterationEl = document.getElementById('transliteration');
+        const sanskritEl = document.getElementById('sanskrit');
+        const translationContainer = document.getElementById('translation-container');
+        const verseIndicator = document.getElementById('verse-indicator');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const toggleBtn = document.querySelector('.toggle-btn');
+        const touchHint = document.getElementById('touch-hint');
+
+        // Show screen
+        function showScreen(screen) {
+            [titleScreen, verseScreen, endScreen].forEach(s => s.classList.remove('active'));
+            screen.classList.add('active');
+        }
+
+        // Start reading
+        function startReading() {
+            currentVerse = 0;
+            showScreen(verseScreen);
+            renderVerse();
+
+            // Show touch hint briefly
+            setTimeout(() => {
+                touchHint.classList.add('visible');
+                setTimeout(() => touchHint.classList.remove('visible'), 3000);
+            }, 500);
+        }
+
+        // Go home
+        function goHome() {
+            showScreen(titleScreen);
+        }
+
+        // Render current verse
+        function renderVerse() {
+            const verse = verses[currentVerse];
+
+            transliterationEl.textContent = verse.transliteration;
+            sanskritEl.textContent = verse.sanskrit;
+
+            // Build translation content
+            let translationHTML = '';
+            if (translationMode === 'literal' || translationMode === 'both') {
+                translationHTML += `<p class="literal">${verse.literal}</p>`;
+            }
+            if (translationMode === 'both') {
+                translationHTML += '<div class="translation-divider"></div>';
+            }
+            if (translationMode === 'english' || translationMode === 'both') {
+                translationHTML += `<p class="english">${verse.english}</p>`;
+            }
+            // Add reference link if present
+            if (verse.link) {
+                translationHTML += `<a href="${verse.link.url}" target="_blank" rel="noopener noreferrer" class="reference-link">${verse.link.text} ↗</a>`;
+            }
+            translationContainer.innerHTML = translationHTML;
+
+            // Update indicator
+            verseIndicator.textContent = `${currentVerse + 1} / ${verses.length}`;
+
+            // Update buttons
+            prevBtn.disabled = currentVerse === 0;
+        }
+
+        // Navigation
+        function nextVerse() {
+            if (currentVerse < verses.length - 1) {
+                currentVerse++;
+                renderVerse();
+            } else {
+                showScreen(endScreen);
+            }
+        }
+
+        function prevVerse() {
+            if (currentVerse > 0) {
+                currentVerse--;
+                renderVerse();
+            }
+        }
+
+        // Toggle translation mode
+        function toggleTranslation() {
+            if (translationMode === 'both') {
+                translationMode = 'literal';
+            } else if (translationMode === 'literal') {
+                translationMode = 'english';
+            } else {
+                translationMode = 'both';
+            }
+            toggleBtn.textContent = translationMode;
+            renderVerse();
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (!verseScreen.classList.contains('active')) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    startReading();
+                }
+                return;
+            }
+
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextVerse();
+            } else if (e.key === 'ArrowLeft') {
+                prevVerse();
+            } else if (e.key === 't' || e.key === 'T') {
+                toggleTranslation();
+            } else if (e.key === 'Escape') {
+                goHome();
+            }
+        });
+
+        // Touch/swipe support
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            if (!verseScreen.classList.contains('active')) return;
+
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // Swipe left - next
+                    nextVerse();
+                } else {
+                    // Swipe right - previous
+                    prevVerse();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
